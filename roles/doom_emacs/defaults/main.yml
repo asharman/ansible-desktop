@@ -1,0 +1,8 @@
+---
+doom_emacs_repo: "https://github.com/hlissner/doom-emacs"
+
+doom_emacs_path: "~/.emacs.d/bin"
+
+emacs_install_path: "/usr/local/opt/emacs-mac"
+
+doom_emacs_install_path: "~/.emacs.d"

@@ -1,0 +1,60 @@
+---
+- name: Install Brew Dependencies
+  include_role:
+    name: geerlingguy.mac.homebrew
+  vars:
+    homebrew_installed_packages:
+      - git
+      - ripgrep
+      - coreutils
+      - fd
+      - cmake
+      - grep
+      - shellcheck
+      - fontconfig
+      - discount
+      - {name: emacs-mac, install_options: with-modules}
+
+    homebrew_taps:
+      - railwaycat/emacsmacport
+      - homebrew/core
+
+- name: Check if Emacs app is already in place
+  stat:
+    path: /Applications/Emacs.app
+  register: emacs_application
+
+- name: Symlink Emacs into Applications directory
+  file:
+    path: "{{ emacs_install_path }}/Emacs.app"
+    dest: "/Applications/Emacs.app"
+    state: link
+  when: not emacs_application.stat.exists
+  become: true
+
+- name: Check if Doom Emacs is installed
+  stat:
+    path: "{{ doom_emacs_path }}/doom"
+  register: doom_emacs
+
+- name: Install Doom Emacs
+  when: not doom_emacs.stat.exists
+  block:
+    - name: Ensure .emacs.d directory doesn't exist
+      file:
+        path: "{{ doom_emacs_install_path }}"
+        state: absent
+
+    - name: Clone Doom Emacs
+      git:
+        repo: "{{ doom_emacs_repo }}"
+        dest: "{{ doom_emacs_install_path }}"
+
+    - name: Install Doom Emacs
+      expect:
+        chdir: "{{ doom_emacs_path }}"
+        command: doom install
+        timeout: null
+        responses:
+          '(y or n)': 'y'
+      async: 600
