@@ -1,0 +1,12 @@
+---
+dotfiles_repo: "https://github.com/asharman/dotfiles.git"
+
+install_dir: "~/dev"
+
+install_path: "{{ install_dir }}/dotfiles"
+
+packages:
+  - doom_emacs
+  - git
+  - vim
+  - zsh
