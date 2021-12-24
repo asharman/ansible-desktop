@@ -1,0 +1,30 @@
+---
+- name: Install Brew Dependencies
+  include_role:
+    name: geerlingguy.mac.homebrew
+  vars:
+    homebrew_installed_packages:
+      - git
+      - stow
+
+- name: Ensure dev directory exists and dotfiles directory doesn't
+  block:
+    - name: Ensure dev directory exists
+      file:
+        path: "{{ install_dir }}"
+        state: directory
+    - name: Ensure dotfiles directory doesn't exist
+      file:
+        path: "{{ install_path }}"
+        state: absent
+
+- name: Clone dotfiles repo
+  git:
+    repo: "{{ dotfiles_repo }}"
+    dest: "{{ install_path }}"
+
+- name: Stow each package in the directory
+  shell:
+    chdir: "{{ install_path }}"
+    cmd: 'stow --target="$HOME" {{ item }}'
+  loop: "{{ packages }}"

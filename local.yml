@@ -8,6 +8,8 @@
     - role: elliotweiser.osx-command-line-tools
     - role: geerlingguy.mac.homebrew
       tags: ['homebrew']
+    - role: dotfiles
+      tags: ['dotfiles']
     - role: doom_emacs
       tags: ['emacs']
     - role: geerlingguy.mac.dock
