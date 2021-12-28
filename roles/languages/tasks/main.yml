@@ -1,0 +1,47 @@
+---
+- name: Install asdf and language dependencies with homebrew
+  include_role:
+    name: geerlingguy.mac.homebrew
+  vars:
+    homebrew_installed_packages:
+      "{{ homebrew_packages }}"
+
+- name: Install plugins
+  command: "asdf plugin add {{ item.name }} {{ item.repository }}"
+  with_items: "{{ asdf_plugins }}"
+  args:
+    creates: "~/.asdf/plugins/{{ item.name }}"
+  when: asdf_plugins|length > 0
+  become: True
+
+- name: Install languages
+  block:
+    - name: Get latest language versions
+      command: "asdf latest {{ item.name }}"
+      with_items: "{{ asdf_plugins }}"
+      register: latest_versions
+
+    - name: Install language
+      command: "asdf install {{item.item.name}} latest"
+      args:
+        creates: "~/.asdf/installs/{{ item.item.name }}/{{ item.stdout }}"
+      with_items: "{{ latest_versions.results }}"
+
+- name: Set global versions
+  command: "asdf global {{ item.name }} latest"
+  with_items: "{{ asdf_plugins }}"
+  when: asdf_plugins|length > 0
+
+- name: Run Additional Language Setup
+  block:
+    - name: Check if additional tasks need to be ran
+      stat:
+        path: "roles/languages/tasks/{{ item.name }}.yml"
+      with_items: "{{ asdf_plugins }}"
+      register: extra_tasks
+
+    # - debug: msg="{{extra_tasks}}"
+
+    - include_tasks: "roles/languages/tasks/{{ item.item.name }}.yml"
+      when: item.stat.exists
+      with_items: "{{ extra_tasks.results }}"

@@ -1,0 +1,31 @@
+---
+- name: Install Elixir LS
+  git:
+    repo: "https://github.com/elixir-lsp/elixir-ls.git"
+    dest: "~/.elixir-ls"
+
+- name: Build Elixir LS
+  block:
+    - name: "Install Hex"
+      command: "mix local.hex --force --if-missing"
+      args:
+        chdir: "~/.elixir-ls"
+
+    - name: "Install mix deps"
+      command: "mix deps.get"
+      args:
+        chdir: "~/.elixir-ls"
+
+    - name: "Mix compile"
+      # If rebar 3 needs to be installed answer the prompt with yes
+      expect:
+        command: "mix compile"
+        responses:
+          '[Yn]': 'y'
+        chdir: "~/.elixir-ls"
+
+    - name: Build the release
+      command: "mix elixir_ls.release -o release"
+      args:
+        creates: "~/.elixir-ls/release"
+        chdir: "~/.elixir-ls"
