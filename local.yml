@@ -10,6 +10,8 @@
       tags: ['homebrew']
     - role: dotfiles
       tags: ['dotfiles']
+    - role: languages
+      tags: ['languages']
     - role: doom_emacs
       tags: ['emacs']
     - role: geerlingguy.mac.dock
