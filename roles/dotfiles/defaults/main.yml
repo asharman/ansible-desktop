@@ -1,5 +1,5 @@
 ---
-dotfiles_repo: "https://github.com/asharman/dotfiles.git"
+dotfiles_repo: "git@github.com:asharman/dotfiles.git"
 
 install_dir: "~/dev"
 
